@@ -1,0 +1,9 @@
+.DS_Store
+*.docx
+.claude/settings.local.json
+programs/*.json
+programs/*.md
+instructions/*.md
+!examples/programs/*.json
+!examples/programs/*.md
+!examples/instructions/*.md
