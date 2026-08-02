@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дневник репетитора</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F6F5;
+    --surface:#FFFFFF;
+    --border:#E1E6E3;
+    --text:#1B2420;
+    --text-muted:#5C6B63;
+    --text-faint:#8B968F;
+
+    --test:#2F6F5E;
+    --test-bg:#E7F1EE;
+    --test-bg-strong:#D9EAE4;
+
+    --topic:#93602E;
+    --topic-bg:#F6EEE0;
+    --topic-bg-strong:#F0E2C9;
+
+    --success:#2E7D4F;
+    --success-bg:#E7F4EC;
+    --danger:#B8433B;
+    --danger-bg:#FBEBE9;
+
+    --radius:14px;
+    --radius-sm:10px;
+    --shadow:0 1px 2px rgba(27,36,32,0.04), 0 4px 16px rgba(27,36,32,0.04);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  header.page-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:28px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .subtitle{
+    color:var(--text-muted);
+    font-size:14px;
+  }
+
+  .profile-bar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:10px 14px;
+    margin-bottom:20px;
+    box-shadow:var(--shadow);
+  }
+  .profile-bar .profile-label{
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .profile-bar select{width:auto;min-width:140px;}
+  .add-profile-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex:1 1 260px;
+  }
+  .add-profile-row input{width:auto;flex:1 1 180px;}
+  .gate-msg{
+    color:var(--text-muted);
+    font-size:13.5px;
+    padding:8px 0;
+  }
+  .subject-warn{
+    color:var(--topic);
+    background:var(--topic-bg);
+    border-radius:var(--radius-sm);
+    font-size:12.5px;
+    padding:7px 11px;
+    margin-top:8px;
+  }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px 24px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:16px;
+    font-weight:600;
+    margin:0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+  }
+
+  /* ---- mode toggle ---- */
+  .mode-toggle{
+    display:inline-flex;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:3px;
+    margin-bottom:16px;
+  }
+  .mode-toggle button{
+    border:none;
+    background:transparent;
+    padding:8px 20px;
+    border-radius:999px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    color:var(--text-muted);
+    transition:all .15s ease;
+  }
+  .mode-toggle button.active[data-mode="test"]{
+    background:var(--test);
+    color:#fff;
+  }
+  .mode-toggle button.active[data-mode="topic"]{
+    background:var(--topic);
+    color:#fff;
+  }
+
+  .mode-hint{
+    font-size:13px;
+    color:var(--text-muted);
+    margin-bottom:12px;
+  }
+  .mode-hint code{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:1px 6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+  }
+
+  textarea, input[type=text], input[type=date], input[type=number], select{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--text);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:9px 12px;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  textarea{
+    resize:vertical;
+    min-height:56px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+  textarea:focus, input:focus, select:focus{
+    border-color:var(--text-faint);
+  }
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+  .row > *{flex:1 1 160px;}
+
+  button.btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    border:none;
+    border-radius:var(--radius-sm);
+    padding:9px 18px;
+    cursor:pointer;
+    color:#fff;
+    background:var(--text);
+    transition:opacity .15s ease;
+    white-space:nowrap;
+  }
+  button.btn:hover{opacity:.88;}
+  button.btn.secondary{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--border);
+  }
+  button.btn.test{background:var(--test);}
+  button.btn.topic{background:var(--topic);}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .parse-row{display:flex;gap:10px;margin-top:10px;align-items:flex-start;}
+  .parse-row textarea{flex:1;}
+  .parse-msg{
+    font-size:12.5px;
+    margin-top:6px;
+    min-height:16px;
+  }
+  .parse-msg.ok{color:var(--success);}
+  .parse-msg.err{color:var(--danger);}
+
+  hr.divider{
+    border:none;
+    border-top:1px dashed var(--border);
+    margin:18px 0;
+  }
+
+  label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-bottom:5px;
+  }
+  .field{margin-bottom:2px;}
+
+  .conditional-fields{display:none;}
+  .conditional-fields.show{display:flex;gap:10px;flex-wrap:wrap;}
+  .conditional-fields > *{flex:1 1 160px;}
+
+  /* ---- filters ---- */
+  .filters{display:flex;gap:14px;flex-wrap:wrap;}
+  .filters .field{flex:1 1 200px;}
+
+  /* ---- stats ---- */
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:12px;
+  }
+  .stat-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    background:var(--test-bg);
+  }
+  .stat-card .subj{
+    font-weight:600;
+    font-size:13.5px;
+    margin-bottom:10px;
+    color:var(--text);
+  }
+  .stat-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-bottom:4px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .stat-line b{
+    color:var(--text);
+    font-weight:600;
+  }
+  .empty-note{
+    color:var(--text-faint);
+    font-size:13.5px;
+    padding:6px 0;
+  }
+
+  /* ---- tables ---- */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  thead th{
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    font-weight:500;
+    padding:8px 10px;
+    border-bottom:1px solid var(--border);
+  }
+  tbody td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  tbody tr:hover{background:var(--bg);}
+  td.mono, .mono-cell{font-family:'JetBrains Mono',monospace;}
+  .pct{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:6px;
+    display:inline-block;
+    font-size:12.5px;
+  }
+  .pct.good{color:var(--success);background:var(--success-bg);}
+  .pct.bad{color:var(--danger);background:var(--danger-bg);}
+  .type-badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:2px 7px;
+    border-radius:5px;
+    font-weight:600;
+  }
+  .type-badge.test{color:var(--test);background:var(--test-bg);}
+  .type-badge.topic{color:var(--topic);background:var(--topic-bg);}
+  .del-btn{
+    border:none;
+    background:transparent;
+    color:var(--text-faint);
+    cursor:pointer;
+    font-size:15px;
+    padding:2px 6px;
+    border-radius:6px;
+  }
+  .del-btn:hover{color:var(--danger);background:var(--danger-bg);}
+
+  .table-head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .table-scroll{overflow-x:auto;}
+
+  footer.hint{
+    text-align:center;
+    color:var(--text-faint);
+    font-size:12px;
+    margin-top:36px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <div>
+      <h1>Дневник репетитора</h1>
+      <div class="subtitle">Офлайн-журнал результатов и разборов тем · любой предмет</div>
+    </div>
+  </header>
+
+  <div class="profile-bar" id="profileBar">
+    <span class="profile-label">Ребёнок</span>
+    <select id="profileSelect"></select>
+    <button type="button" class="btn secondary" id="addProfileBtn">+ Добавить ребёнка</button>
+    <div class="add-profile-row" id="addProfileRow" style="display:none;">
+      <input type="text" id="newProfileName" placeholder="Имя ребёнка">
+      <button type="button" class="btn" id="confirmAddProfile">Добавить</button>
+      <button type="button" class="btn secondary" id="cancelAddProfile">Отмена</button>
+    </div>
+  </div>
+
+  <!-- ADD RECORD -->
+  <section class="card">
+    <h2><span class="eyebrow">01</span> Добавление записи</h2>
+    <div class="gate-msg" id="profileGateMsg" style="display:none;">Сначала создайте профиль ребёнка (кнопка выше), чтобы добавить запись.</div>
+    <div id="addRecordBody">
+
+    <div class="mode-toggle" id="modeToggle">
+      <button type="button" data-mode="test" class="active">Тест</button>
+      <button type="button" data-mode="topic">Тема</button>
+    </div>
+
+    <div class="mode-hint" id="modeHint"></div>
+
+    <div class="parse-row">
+      <textarea id="rawLine" placeholder=""></textarea>
+      <button class="btn test" id="parseBtn">Разобрать строку</button>
+    </div>
+    <div class="parse-msg" id="parseMsg"></div>
+
+    <hr class="divider">
+
+    <div class="row">
+      <div class="field">
+        <label>Дата</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>Предмет</label>
+        <input type="text" id="fSubject" list="subjectList" placeholder="Любой предмет">
+        <datalist id="subjectList"></datalist>
+      </div>
+    </div>
+    <div class="subject-warn" id="subjectWarn" style="display:none;"></div>
+
+    <div class="row" style="margin-top:10px;">
+      <div class="field" style="flex:2 1 260px;">
+        <label>Тема / срез</label>
+        <input type="text" id="fTopic" placeholder="Тема занятия или описание задачи">
+      </div>
+    </div>
+
+    <div class="conditional-fields show" id="testFields" style="margin-top:10px;">
+      <div class="field">
+        <label>Баллов набрано</label>
+        <input type="number" id="fScore" min="0">
+      </div>
+      <div class="field">
+        <label>Баллов максимум</label>
+        <input type="number" id="fMax" min="0">
+      </div>
+      <div class="field" style="flex:2 1 260px;">
+        <label>Темы ошибок (необязательно)</label>
+        <input type="text" id="fMistakesTest" placeholder="Например: раскрытие скобок">
+      </div>
+    </div>
+
+    <div class="conditional-fields" id="topicFields" style="margin-top:10px;">
+      <div class="field" style="flex:1 1 260px;">
+        <label>Ответ ученика</label>
+        <input type="text" id="fAnswer" placeholder="Например: -16">
+      </div>
+      <div class="field" style="flex:1 1 260px;">
+        <label>В чём ошибка</label>
+        <input type="text" id="fMistakeTopic" placeholder="Например: перепутаны переменные x и y">
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <button class="btn" id="saveBtn">Сохранить запись</button>
+      <span class="parse-msg" id="saveMsg"></span>
+    </div>
+
+    </div>
+  </section>
+
+  <!-- FILTERS -->
+  <section class="card">
+    <h2><span class="eyebrow">02</span> Фильтры</h2>
+    <div class="filters">
+      <div class="field">
+        <label>Ребёнок</label>
+        <select id="filterChild"><option value="all">Все</option></select>
+      </div>
+      <div class="field">
+        <label>Предмет</label>
+        <select id="filterSubject"><option value="all">Все</option></select>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="card">
+    <h2><span class="eyebrow">03</span> Статистика по предметам <span style="font-weight:400;color:var(--text-faint);font-size:12px;">(только тесты)</span></h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="empty-note" id="statsEmpty" style="display:none;">Пока нет тестовых записей для статистики.</div>
+  </section>
+
+  <!-- TESTS TABLE -->
+  <section class="card">
+    <div class="table-head-row">
+      <h2 style="margin:0;"><span class="eyebrow">04</span> Тесты</h2>
+      <button class="btn secondary" id="exportTests">Скачать CSV (тесты)</button>
+    </div>
+    <div class="table-scroll">
+      <table id="testsTable">
+        <thead><tr>
+          <th>Дата</th><th>Ребёнок</th><th>Предмет</th><th>Тема</th><th>Балл</th><th>%</th><th>Ошибки</th><th></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="empty-note" id="testsEmpty" style="display:none;">Записей пока нет.</div>
+  </section>
+
+  <!-- TOPICS TABLE -->
+  <section class="card">
+    <div class="table-head-row">
+      <h2 style="margin:0;"><span class="eyebrow">05</span> Темы <span style="font-weight:400;color:var(--text-faint);font-size:12px;">— журнал разбора ошибок</span></h2>
+      <button class="btn secondary" id="exportTopics">Скачать CSV (темы)</button>
+    </div>
+    <div class="table-scroll">
+      <table id="topicsTable">
+        <thead><tr>
+          <th>Дата</th><th>Ребёнок</th><th>Предмет</th><th>Тема / задача</th><th>Описание</th><th></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="empty-note" id="topicsEmpty" style="display:none;">Записей пока нет.</div>
+  </section>
+
+  <footer class="hint">Все данные хранятся локально в этом браузере (localStorage). Без интернета и без сервера.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "tutorDiaryRecords";
+  var currentMode = "test";
+
+  // ---------- storage ----------
+  function loadRecords(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveRecords(records){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }
+  function addRecord(rec){
+    var records = loadRecords();
+    rec.id = "r" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
+    records.push(rec);
+    saveRecords(records);
+  }
+  function deleteRecord(id){
+    var records = loadRecords().filter(function(r){ return r.id !== id; });
+    saveRecords(records);
+    renderAll();
+  }
+
+  // ---------- child profiles ----------
+  var PROFILES_KEY = "tutorDiaryProfiles";
+  var CURRENT_PROFILE_KEY = "tutorDiaryCurrentProfile";
+
+  function loadProfiles(){
+    try{
+      var raw = localStorage.getItem(PROFILES_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveProfiles(list){
+    localStorage.setItem(PROFILES_KEY, JSON.stringify(list));
+  }
+  function loadCurrentProfile(){
+    return localStorage.getItem(CURRENT_PROFILE_KEY) || null;
+  }
+  function saveCurrentProfileName(name){
+    localStorage.setItem(CURRENT_PROFILE_KEY, name);
+  }
+  function createProfile(rawName){
+    var name = (rawName || '').trim();
+    if(!name) return null;
+    var profiles = loadProfiles();
+    var existing = profiles.find(function(p){ return p.toLowerCase() === name.toLowerCase(); });
+    if(existing){
+      saveCurrentProfileName(existing);
+      return existing;
+    }
+    profiles.push(name);
+    saveProfiles(profiles);
+    saveCurrentProfileName(name);
+    return name;
+  }
+  function migrateProfilesFromRecords(){
+    if(loadProfiles().length > 0) return;
+    var namesFromRecords = existingChildren();
+    if(namesFromRecords.length > 0) saveProfiles(namesFromRecords);
+  }
+  function renderProfileBar(){
+    migrateProfilesFromRecords();
+    var profiles = loadProfiles();
+    var current = loadCurrentProfile();
+    var select = document.getElementById('profileSelect');
+
+    if(current && profiles.indexOf(current) === -1) current = null;
+    if(!current && profiles.length > 0){
+      current = profiles[0];
+      saveCurrentProfileName(current);
+    }
+
+    select.innerHTML = profiles.map(function(p){
+      return '<option value="'+escapeHtml(p)+'">'+escapeHtml(p)+'</option>';
+    }).join('');
+    select.style.display = profiles.length ? 'inline-block' : 'none';
+    if(current) select.value = current;
+
+    document.getElementById('addProfileBtn').textContent = profiles.length ? '+ Новый ребёнок' : '+ Добавить ребёнка';
+
+    var gateMsg = document.getElementById('profileGateMsg');
+    var body = document.getElementById('addRecordBody');
+    if(current){
+      gateMsg.style.display = 'none';
+      body.style.display = '';
+    } else {
+      gateMsg.style.display = 'block';
+      body.style.display = 'none';
+    }
+  }
+
+  document.getElementById('profileSelect').addEventListener('change', function(e){
+    saveCurrentProfileName(e.target.value);
+    renderAll();
+  });
+  document.getElementById('addProfileBtn').addEventListener('click', function(){
+    var row = document.getElementById('addProfileRow');
+    row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+    if(row.style.display === 'flex') document.getElementById('newProfileName').focus();
+  });
+  document.getElementById('cancelAddProfile').addEventListener('click', function(){
+    document.getElementById('newProfileName').value = '';
+    document.getElementById('addProfileRow').style.display = 'none';
+  });
+  document.getElementById('confirmAddProfile').addEventListener('click', function(){
+    var input = document.getElementById('newProfileName');
+    var name = createProfile(input.value);
+    if(!name) return;
+    input.value = '';
+    document.getElementById('addProfileRow').style.display = 'none';
+    renderAll();
+  });
+  document.getElementById('newProfileName').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('confirmAddProfile').click();
+  });
+
+  // ---------- subject normalization (universal, no hardcoded list) ----------
+  function existingSubjects(){
+    var set = {};
+    loadRecords().forEach(function(r){
+      if(r.subject) set[r.subject.toLowerCase()] = r.subject;
+    });
+    return Object.keys(set).map(function(k){ return set[k]; }).sort(function(a,b){return a.localeCompare(b,'ru');});
+  }
+  function normalizeSubject(raw){
+    var trimmed = (raw || "").trim();
+    if(!trimmed) return trimmed;
+    var found = existingSubjects().find(function(s){
+      return s.toLowerCase() === trimmed.toLowerCase();
+    });
+    if(found) return found;
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  }
+  function existingChildren(){
+    var set = {};
+    loadRecords().forEach(function(r){
+      if(r.child) set[r.child.toLowerCase()] = r.child;
+    });
+    return Object.keys(set).map(function(k){ return set[k]; }).sort(function(a,b){return a.localeCompare(b,'ru');});
+  }
+  function findSimilarSubject(raw){
+    var trimmed = (raw || '').trim();
+    if(!trimmed) return null;
+    var lower = trimmed.toLowerCase();
+    var existing = existingSubjects();
+    var exact = existing.some(function(s){ return s.toLowerCase() === lower; });
+    if(exact) return null;
+    var similar = existing.find(function(s){
+      var sLower = s.toLowerCase();
+      return sLower.indexOf(lower) !== -1 || lower.indexOf(sLower) !== -1;
+    });
+    return similar || null;
+  }
+  function renderSubjectWarning(){
+    var similar = findSimilarSubject(document.getElementById('fSubject').value);
+    var warnEl = document.getElementById('subjectWarn');
+    if(similar){
+      warnEl.textContent = 'Похоже на уже существующий предмет «' + similar + '». Тот же предмет — впишите точно так же; другой — можно продолжать.';
+      warnEl.style.display = 'block';
+    } else {
+      warnEl.style.display = 'none';
+    }
+  }
+  document.getElementById('fSubject').addEventListener('input', renderSubjectWarning);
+
+  // ---------- mode UI ----------
+  var HINTS = {
+    test: 'Вставьте строку вида: <code>ОТЧЁТ ТЕСТА: 2026-07-29 | алгебра | Тема 5. Свойства действий | 7/8 | раскрытие скобок</code>',
+    topic: 'Вставьте строку вида: <code>ОТЧЁТ ТЕМЫ: 2026-07-29 | алгебра | подстановка значений в 3x - 2y | ответ: -16 | ошибка: перепутаны переменные</code>'
+  };
+  var PLACEHOLDERS = {
+    test: "ОТЧЁТ ТЕСТА: 2026-07-29 | алгебра | Тема 5. Свойства действий над числами | 7/8 | раскрытие скобок",
+    topic: "ОТЧЁТ ТЕМЫ: 2026-07-29 | алгебра | подстановка значений в выражение 3x - 2y | ответ: -16 | ошибка: перепутаны переменные x и y"
+  };
+
+  function setMode(mode){
+    currentMode = mode;
+    document.querySelectorAll('#modeToggle button').forEach(function(b){
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+    document.getElementById('modeHint').innerHTML = HINTS[mode];
+    document.getElementById('rawLine').placeholder = PLACEHOLDERS[mode];
+    document.getElementById('parseBtn').className = 'btn ' + mode;
+    document.getElementById('testFields').classList.toggle('show', mode === 'test');
+    document.getElementById('topicFields').classList.toggle('show', mode === 'topic');
+    document.getElementById('parseMsg').textContent = '';
+  }
+
+  document.getElementById('modeToggle').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-mode]');
+    if(btn) setMode(btn.dataset.mode);
+  });
+
+  // ---------- parsing ----------
+  function stripPrefix(s){
+    return s.replace(/^\s*ОТЧЁТ(?:\s*(?:ТЕСТА|ТЕМЫ))?\s*:\s*/i, '');
+  }
+
+  function parseLine(){
+    var raw = document.getElementById('rawLine').value.trim();
+    var msgEl = document.getElementById('parseMsg');
+    if(!raw){ msgEl.textContent = 'Вставьте строку отчёта.'; msgEl.className='parse-msg err'; return; }
+
+    var body = stripPrefix(raw);
+    var parts = body.split('|').map(function(p){ return p.trim(); });
+
+    if(parts.length < 3){
+      msgEl.textContent = 'Не удалось разобрать: нужно минимум дата | предмет | тема.';
+      msgEl.className = 'parse-msg err';
+      return;
+    }
+
+    var date = parts[0];
+    var subject = parts[1];
+    var topic = parts[2];
+    var rest = parts.slice(3).join(' | ');
+
+    document.getElementById('fDate').value = normalizeDate(date);
+    document.getElementById('fSubject').value = normalizeSubject(subject);
+    document.getElementById('fTopic').value = topic;
+    renderSubjectWarning();
+
+    if(currentMode === 'test'){
+      var m = rest.match(/(\d+)\s*\/\s*(\d+)/);
+      if(m){
+        document.getElementById('fScore').value = m[1];
+        document.getElementById('fMax').value = m[2];
+        var afterScore = rest.slice(rest.indexOf(m[0]) + m[0].length).replace(/^\s*\|\s*/, '').trim();
+        document.getElementById('fMistakesTest').value = afterScore;
+        msgEl.textContent = 'Строка распознана как отчёт теста.';
+        msgEl.className = 'parse-msg ok';
+      } else {
+        msgEl.textContent = 'В строке не найден балл вида «7/8». Заполните форму вручную.';
+        msgEl.className = 'parse-msg err';
+      }
+    } else {
+      var ansMatch = rest.match(/ответ\s*:\s*([^|]*)/i);
+      var mistakeMatch = rest.match(/ошибка\s*:\s*([^|]*)/i);
+      if(ansMatch || mistakeMatch){
+        document.getElementById('fAnswer').value = ansMatch ? ansMatch[1].trim() : '';
+        document.getElementById('fMistakeTopic').value = mistakeMatch ? mistakeMatch[1].trim() : '';
+        msgEl.textContent = 'Строка распознана как разбор темы.';
+        msgEl.className = 'parse-msg ok';
+      } else {
+        document.getElementById('fMistakeTopic').value = rest;
+        msgEl.textContent = 'Не найдены явные «ответ:»/«ошибка:», текст помещён в поле ошибки.';
+        msgEl.className = 'parse-msg err';
+      }
+    }
+  }
+  function normalizeDate(d){
+    var m = d.match(/(\d{4})-(\d{2})-(\d{2})/);
+    return m ? m[0] : d;
+  }
+  document.getElementById('parseBtn').addEventListener('click', parseLine);
+
+  // ---------- save ----------
+  function saveCurrentForm(){
+    var msgEl = document.getElementById('saveMsg');
+    var date = document.getElementById('fDate').value;
+    var child = loadCurrentProfile();
+    var subject = normalizeSubject(document.getElementById('fSubject').value);
+    var topic = document.getElementById('fTopic').value.trim();
+
+    if(!child){
+      msgEl.textContent = 'Сначала выберите или создайте профиль ребёнка.';
+      msgEl.className = 'parse-msg err';
+      return;
+    }
+    if(!topic){
+      msgEl.textContent = 'Заполните тему.';
+      msgEl.className = 'parse-msg err';
+      return;
+    }
+
+    var rec = {
+      date: date || new Date().toISOString().slice(0,10),
+      child: child,
+      subject: subject,
+      topic: topic,
+      type: currentMode
+    };
+
+    if(currentMode === 'test'){
+      var score = parseFloat(document.getElementById('fScore').value);
+      var max = parseFloat(document.getElementById('fMax').value);
+      if(isNaN(score) || isNaN(max) || max <= 0){
+        msgEl.textContent = 'Укажите баллы: набрано и максимум (максимум > 0).';
+        msgEl.className = 'parse-msg err';
+        return;
+      }
+      rec.score = score;
+      rec.max = max;
+      rec.mistakes = document.getElementById('fMistakesTest').value.trim();
+    } else {
+      rec.score = 0;
+      rec.max = 0;
+      rec.answer = document.getElementById('fAnswer').value.trim();
+      rec.mistakes = document.getElementById('fMistakeTopic').value.trim();
+    }
+
+    addRecord(rec);
+    msgEl.textContent = 'Запись сохранена.';
+    msgEl.className = 'parse-msg ok';
+
+    document.getElementById('rawLine').value = '';
+    document.getElementById('fTopic').value = '';
+    document.getElementById('fScore').value = '';
+    document.getElementById('fMax').value = '';
+    document.getElementById('fMistakesTest').value = '';
+    document.getElementById('fAnswer').value = '';
+    document.getElementById('fMistakeTopic').value = '';
+
+    renderAll();
+    setTimeout(function(){ msgEl.textContent=''; }, 3000);
+  }
+  document.getElementById('saveBtn').addEventListener('click', saveCurrentForm);
+
+  // ---------- filters ----------
+  function currentFilters(){
+    return {
+      child: document.getElementById('filterChild').value,
+      subject: document.getElementById('filterSubject').value
+    };
+  }
+  function applyFilters(records){
+    var f = currentFilters();
+    return records.filter(function(r){
+      if(f.child !== 'all' && r.child !== f.child) return false;
+      if(f.subject !== 'all' && r.subject !== f.subject) return false;
+      return true;
+    });
+  }
+  function populateFilterOptions(){
+    var childSel = document.getElementById('filterChild');
+    var subjSel = document.getElementById('filterSubject');
+    var prevChild = childSel.value || 'all';
+    var prevSubj = subjSel.value || 'all';
+
+    childSel.innerHTML = '<option value="all">Все</option>' +
+      existingChildren().map(function(c){ return '<option value="'+escapeHtml(c)+'">'+escapeHtml(c)+'</option>'; }).join('');
+    subjSel.innerHTML = '<option value="all">Все</option>' +
+      existingSubjects().map(function(s){ return '<option value="'+escapeHtml(s)+'">'+escapeHtml(s)+'</option>'; }).join('');
+
+    if([].slice.call(childSel.options).some(function(o){return o.value===prevChild;})) childSel.value = prevChild;
+    if([].slice.call(subjSel.options).some(function(o){return o.value===prevSubj;})) subjSel.value = prevSubj;
+
+    document.getElementById('subjectList').innerHTML = existingSubjects().map(function(s){return '<option value="'+escapeHtml(s)+'">';}).join('');
+  }
+  document.getElementById('filterChild').addEventListener('change', renderAll);
+  document.getElementById('filterSubject').addEventListener('change', renderAll);
+
+  // ---------- stats ----------
+  function renderStats(filtered){
+    var tests = filtered.filter(function(r){ return r.type === 'test'; });
+    var bySubject = {};
+    tests.forEach(function(r){
+      if(!bySubject[r.subject]) bySubject[r.subject] = [];
+      bySubject[r.subject].push(r);
+    });
+    var subjects = Object.keys(bySubject).sort(function(a,b){return a.localeCompare(b,'ru');});
+    var grid = document.getElementById('statsGrid');
+    var empty = document.getElementById('statsEmpty');
+
+    if(subjects.length === 0){
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    grid.innerHTML = subjects.map(function(subj){
+      var arr = bySubject[subj];
+      var pcts = arr.map(function(r){ return (r.score / r.max) * 100; });
+      var avg = pcts.reduce(function(a,b){return a+b;},0) / pcts.length;
+      var min = Math.min.apply(null, pcts);
+      var below = pcts.filter(function(p){ return p < 75; }).length;
+      return '<div class="stat-card">' +
+        '<div class="subj">'+escapeHtml(subj)+'</div>' +
+        '<div class="stat-line"><span>Тестов/срезов</span><b>'+arr.length+'</b></div>' +
+        '<div class="stat-line"><span>Средний балл</span><b>'+avg.toFixed(0)+'%</b></div>' +
+        '<div class="stat-line"><span>Минимальный балл</span><b>'+min.toFixed(0)+'%</b></div>' +
+        '<div class="stat-line"><span>Записей ниже 75%</span><b>'+below+'</b></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ---------- tables ----------
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function renderTestsTable(filtered){
+    var tests = filtered.filter(function(r){ return r.type === 'test'; })
+      .sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    var tbody = document.querySelector('#testsTable tbody');
+    var empty = document.getElementById('testsEmpty');
+
+    if(tests.length === 0){
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = tests.map(function(r){
+      var pct = Math.round((r.score / r.max) * 100);
+      var pctClass = pct >= 75 ? 'good' : 'bad';
+      return '<tr>' +
+        '<td class="mono">'+escapeHtml(r.date)+'</td>' +
+        '<td>'+escapeHtml(r.child)+'</td>' +
+        '<td>'+escapeHtml(r.subject)+'</td>' +
+        '<td>'+escapeHtml(r.topic)+'</td>' +
+        '<td class="mono">'+r.score+'/'+r.max+'</td>' +
+        '<td><span class="pct '+pctClass+'">'+pct+'%</span></td>' +
+        '<td>'+escapeHtml(r.mistakes || '—')+'</td>' +
+        '<td><button class="del-btn" data-id="'+r.id+'" title="Удалить">✕</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderTopicsTable(filtered){
+    var topics = filtered.filter(function(r){ return r.type === 'topic'; })
+      .sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    var tbody = document.querySelector('#topicsTable tbody');
+    var empty = document.getElementById('topicsEmpty');
+
+    if(topics.length === 0){
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    tbody.innerHTML = topics.map(function(r){
+      var desc = [];
+      if(r.answer) desc.push('ответ: ' + r.answer);
+      if(r.mistakes) desc.push('ошибка: ' + r.mistakes);
+      return '<tr>' +
+        '<td class="mono">'+escapeHtml(r.date)+'</td>' +
+        '<td>'+escapeHtml(r.child)+'</td>' +
+        '<td>'+escapeHtml(r.subject)+'</td>' +
+        '<td>'+escapeHtml(r.topic)+'</td>' +
+        '<td>'+escapeHtml(desc.join(' · ') || '—')+'</td>' +
+        '<td><button class="del-btn" data-id="'+r.id+'" title="Удалить">✕</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  document.querySelector('#testsTable tbody').addEventListener('click', function(e){
+    var btn = e.target.closest('.del-btn');
+    if(btn) deleteRecord(btn.dataset.id);
+  });
+  document.querySelector('#topicsTable tbody').addEventListener('click', function(e){
+    var btn = e.target.closest('.del-btn');
+    if(btn) deleteRecord(btn.dataset.id);
+  });
+
+  // ---------- CSV export ----------
+  function downloadCsv(rows, filename){
+    var csv = rows.map(function(row){
+      return row.map(function(cell){
+        var s = String(cell == null ? '' : cell).replace(/"/g,'""');
+        return '"' + s + '"';
+      }).join(',');
+    }).join('\r\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('exportTests').addEventListener('click', function(){
+    var filtered = applyFilters(loadRecords()).filter(function(r){ return r.type === 'test'; });
+    var rows = [['Дата','Ребёнок','Предмет','Тема','Балл','Максимум','%','Ошибки']];
+    filtered.forEach(function(r){
+      rows.push([r.date, r.child, r.subject, r.topic, r.score, r.max, Math.round((r.score/r.max)*100), r.mistakes || '']);
+    });
+    downloadCsv(rows, 'tutor-diary-tests.csv');
+  });
+  document.getElementById('exportTopics').addEventListener('click', function(){
+    var filtered = applyFilters(loadRecords()).filter(function(r){ return r.type === 'topic'; });
+    var rows = [['Дата','Ребёнок','Предмет','Тема/задача','Ответ','Ошибка']];
+    filtered.forEach(function(r){
+      rows.push([r.date, r.child, r.subject, r.topic, r.answer || '', r.mistakes || '']);
+    });
+    downloadCsv(rows, 'tutor-diary-topics.csv');
+  });
+
+  // ---------- render orchestration ----------
+  function renderAll(){
+    renderProfileBar();
+    renderSubjectWarning();
+    populateFilterOptions();
+    var filtered = applyFilters(loadRecords());
+    renderStats(filtered);
+    renderTestsTable(filtered);
+    renderTopicsTable(filtered);
+  }
+
+  // ---------- init ----------
+  document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+  setMode('test');
+  renderAll();
+
+})();
+</script>
+</body>
+</html>
